@@ -5,15 +5,21 @@ import requests
 import os
 import sys
 
-source_sites = {"HKN": "https://hkn.eecs.berkeley.edu", "TBP": "https://tbp.berkeley.edu"}
+__author__ = "Shafqat Dulal"
+
+source_sites = {"HKN": "https://hkn.eecs.berkeley.edu",
+                "TBP": "https://tbp.berkeley.edu"}
 index_to_exam_type = [-1, -1, "Midterm 1", "Midterm 2", "Midterm 3", "Final"]
 
-def download(source, class_number, semester, exam_type, content_type, exam_link):
+
+def download(source, class_number, semester,
+             exam_type, content_type, exam_link):
     if exam_link:
         extension = "pdf"
         if source == "HKN":
             extension = exam_link[-3:]
-        file_name = "CS {0}/{1} {2} {3}.{4}".format(class_number, exam_type, semester, content_type, extension)
+        file_name = "CS {0}/{1} {2} {3}.{4}".format(
+            class_number, exam_type, semester, content_type, extension)
         file_link = "{0}{1}".format(source_sites[source], exam_link)
         if not os.path.exists(file_name):
             with open(file_name, 'wb') as exam:
@@ -23,14 +29,21 @@ def download(source, class_number, semester, exam_type, content_type, exam_link)
                         break
                     exam.write(block)
 
+
 def download_files(source, class_number, dict_links):
     for semester in dict_links:
-            for exam_type in dict_links[semester]:
-                exam, solution = dict_links[semester][exam_type]
-                if exam and solution:
-                    download(source, class_number, semester, exam_type, "Exam", exam)
-                    download(source, class_number, semester, exam_type, "Solution", solution)
-                    print("{0} for semester {1} is complete!".format(exam_type, semester))
+        for exam_type in dict_links[semester]:
+            exam, solution = dict_links[semester][exam_type]
+            if exam and solution:
+                download(
+                    source, class_number, semester, exam_type, "Exam", exam)
+                download(
+                    source, class_number, semester,
+                    exam_type, "Solution", solution)
+                print(
+                    "{0} for semester {1} is complete!"
+                    .format(exam_type, semester))
+
 
 def pull_from_TBP(class_number, super_dict):
     print("Pulling from TBP.")
@@ -57,9 +70,11 @@ def pull_from_TBP(class_number, super_dict):
 
     download_files("TBP", class_number, super_dict)
 
+
 def pull_from_HKN(class_number, super_dict):
     print("Pulling from HKN.")
-    site = "https://hkn.eecs.berkeley.edu/exams/course/cs/{0}".format(class_number)
+    site = "https://hkn.eecs.berkeley.edu/exams/course/cs/{0}".format(
+        class_number)
     resp = urllib.request.urlopen(site)
     soup = BeautifulSoup(resp, "html.parser",
                          from_encoding=resp.info().get_param('charset'))
@@ -79,14 +94,22 @@ def pull_from_HKN(class_number, super_dict):
 
     download_files("HKN", class_number, super_dict)
 
+
 def main(class_numbers):
     for class_number in class_numbers:
+        folder = "CS {0}".format(class_number)
         try:
-            os.makedirs("CS {0}".format(class_number), exist_ok=True)
-            pull_from_TBP(class_number, defaultdict(lambda: defaultdict(lambda: [None, None])))
-            pull_from_HKN(class_number, defaultdict(lambda: defaultdict(lambda: [None, None])))
+            os.makedirs(folder, exist_ok=True)
+            pull_from_TBP(
+                class_number,
+                defaultdict(lambda: defaultdict(lambda: [None, None])))
+            pull_from_HKN(
+                class_number,
+                defaultdict(lambda: defaultdict(lambda: [None, None])))
         except:
             print("An exception has occurred.")
+            if not os.listdir(folder):
+                os.rmdir(folder)
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
