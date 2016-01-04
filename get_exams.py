@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 from collections import defaultdict
+from threading import Thread
 import urllib.request
 import requests
 import os
@@ -35,14 +36,14 @@ def download_files(source, class_number, dict_links):
         for exam_type in dict_links[semester]:
             exam, solution = dict_links[semester][exam_type]
             if exam and solution:
-                download(
-                    source, class_number, semester, exam_type, "Exam", exam)
-                download(
-                    source, class_number, semester,
-                    exam_type, "Solution", solution)
-                print(
-                    "{0} for semester {1} is complete!"
-                    .format(exam_type, semester))
+                Thread(target=download,
+                       args=(source, class_number, semester,
+                             exam_type, "Exam", exam)).start()
+                Thread(target=download,
+                       args=(source, class_number, semester,
+                             exam_type, "Solution", solution)).start()
+                print("{0} for semester {1} is complete!"
+                      .format(exam_type, semester))
 
 
 def pull_from_TBP(class_number, super_dict):
