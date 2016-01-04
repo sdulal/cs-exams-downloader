@@ -1,5 +1,5 @@
 CS Exams Downloader
-================
+===================
 
 The CS Exams Downloader can be used to download past exams for UC Berkeley's 
 CS courses. It makes use of HKN and TBP's databases. As of this writing, the
@@ -8,10 +8,13 @@ on those databases.
 
 ## Setup
 
-Simply clone this repo to get started. Note that the following extra modules
-are required to run the application:
+Simply clone this repo to get started. Note that the application makes use of
+the following extra modules:
 - [Beautiful Soup 4](http://www.crummy.com/software/BeautifulSoup/)
 - [Requests](http://docs.python-requests.org/en/latest/)
+
+Users of ``pip`` can install these modules using 
+``pip install -r requirements.txt.``
 
 ## Usage
 

@@ -1,13 +1,13 @@
 from bs4 import BeautifulSoup
 from collections import defaultdict
 from threading import Thread
-import urllib.request
-import requests
+import argparse
 import os
+import requests
 import sys
+import urllib.request
 
 __author__ = "Shafqat Dulal"
-
 source_sites = {"HKN": "https://hkn.eecs.berkeley.edu",
                 "TBP": "https://tbp.berkeley.edu"}
 index_to_exam_type = [-1, -1, "Midterm 1", "Midterm 2", "Midterm 3", "Final"]
@@ -29,8 +29,9 @@ def download(source, class_number, semester,
                     if not block:
                         break
                     exam.write(block)
-        print("{0} ({1}) for {2} is complete!".format(exam_type, content_type,
-                                                      semester))
+        verbose_print("{0} ({1}) for {2} is complete!".format(exam_type,
+                                                              content_type,
+                                                              semester))
 
 
 def download_files(source, class_number, dict_links):
@@ -47,7 +48,7 @@ def download_files(source, class_number, dict_links):
 
 
 def pull_from_TBP(class_number, super_dict):
-    print("Pulling from TBP.")
+    verbose_print("Pulling from TBP.")
     site = "https://tbp.berkeley.edu/courses/cs/{0}".format(class_number)
     resp = urllib.request.urlopen(site)
     soup = BeautifulSoup(resp, "html.parser",
@@ -73,7 +74,7 @@ def pull_from_TBP(class_number, super_dict):
 
 
 def pull_from_HKN(class_number, super_dict):
-    print("Pulling from HKN.")
+    verbose_print("Pulling from HKN.")
     site = "https://hkn.eecs.berkeley.edu/exams/course/cs/{0}".format(
         class_number)
     resp = urllib.request.urlopen(site)
@@ -113,8 +114,15 @@ def main(class_numbers):
                 os.rmdir(folder)
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Please input valid class numbers (ex. 186 for CS 186).")
-    else:
-        sys.argv.pop(0)
-        main(sys.argv)
+    parser = argparse.ArgumentParser(
+        description="Download past computer science exams \
+                     that have corresponding solutions available online.")
+    parser.add_argument('classes', metavar='class', type=str,
+                        nargs="+", help="CS class to get \
+                                                    exams for (ex. 170, 162)")
+    parser.add_argument('-v', '--verbose', action='store_true',
+                        default=False, help="Provide more \
+                                                 detail on download progress")
+    args = parser.parse_args()
+    verbose_print = print if args.verbose else lambda *a, **k: None
+    main(args.classes)
