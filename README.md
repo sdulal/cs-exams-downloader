@@ -2,9 +2,10 @@ CS Exams Downloader
 ===================
 
 The CS Exams Downloader can be used to download past exams for UC Berkeley's 
-CS courses. It makes use of HKN and TBP's databases. As of this writing, the
-program downloads only those exams that also have their solutions available
-on those databases.
+CS courses. It makes use of HKN and TBP's databases. The program downloads by
+default only those exams that also have their solutions available on those 
+databases, though this may be adjusted with flags
+(use ``python3 get_exams.py --help`` to learn more)!
 
 ## Setup
 
