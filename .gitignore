@@ -1,2 +1,5 @@
 # Folders containing exams.
 CS *
+
+# Log file.
+error.log

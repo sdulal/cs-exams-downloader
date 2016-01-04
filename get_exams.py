@@ -15,7 +15,7 @@ index_to_exam_type = [-1, -1, "Midterm 1", "Midterm 2", "Midterm 3", "Final"]
 
 def download(source, class_number, semester,
              exam_type, content_type, exam_link):
-    if exam_link:
+    if is_valid_download(content_type, exam_link):
         extension = "pdf"
         if source == "HKN":
             extension = exam_link[-3:]
@@ -38,7 +38,7 @@ def download_files(source, class_number, dict_links):
     for semester in dict_links:
         for exam_type in dict_links[semester]:
             exam, solution = dict_links[semester][exam_type]
-            if exam and solution:
+            if should_try_download(exam, solution):
                 Thread(target=download,
                        args=(source, class_number, semester,
                              exam_type, "Exam", exam)).start()
@@ -108,8 +108,11 @@ def main(class_numbers):
             pull_from_HKN(
                 class_number,
                 defaultdict(lambda: defaultdict(lambda: [None, None])))
-        except:
+        except Exception as e:
             print("An exception has occurred.")
+            with open('error.log', 'a') as error_log:
+                error_log.write(str(e))
+                error_log.write('\n\n')
             if not os.listdir(folder):
                 os.rmdir(folder)
 
@@ -117,12 +120,32 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Download past computer science exams \
                      that have corresponding solutions available online.")
-    parser.add_argument('classes', metavar='class', type=str,
-                        nargs="+", help="CS class to get \
-                                                    exams for (ex. 170, 162)")
-    parser.add_argument('-v', '--verbose', action='store_true',
-                        default=False, help="Provide more \
-                                                 detail on download progress")
+    parser.add_argument('classes', metavar='class', type=str, nargs="+",
+                        help="class to get exam-solution pairs \
+                                                        for (ex. 170, 162)")
+    parser.add_argument('-v', '--verbose', action='store_true', default=False,
+                        help="provide more detail on download progress")
+    parser.add_argument('-u', '--unpaired', action='store_true', default=False,
+                        help="consider unpaired exam/solution files")
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('-e', '--exams', action='store_const', default='',
+                       const='Exam', help="download only exam files")
+    group.add_argument('-s', '--solutions', action='store_const', default='',
+                       const='Solution', help="download only solution files")
     args = parser.parse_args()
+
     verbose_print = print if args.verbose else lambda *a, **k: None
+
+    def should_try_download(exam, solution):
+        return ((exam and solution) or args.unpaired)
+
+    def is_valid_download(content_type, exam_link):
+        if not exam_link:
+            return False
+        if args.exams:
+            return content_type == args.exams
+        if args.solutions:
+            return content_type == args.solutions
+        return True
+
     main(args.classes)
