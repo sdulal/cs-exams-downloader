@@ -29,6 +29,8 @@ def download(source, class_number, semester,
                     if not block:
                         break
                     exam.write(block)
+        print("{0} ({1}) for {2} is complete!".format(exam_type, content_type,
+                                                      semester))
 
 
 def download_files(source, class_number, dict_links):
@@ -42,8 +44,6 @@ def download_files(source, class_number, dict_links):
                 Thread(target=download,
                        args=(source, class_number, semester,
                              exam_type, "Solution", solution)).start()
-                print("{0} for semester {1} is complete!"
-                      .format(exam_type, semester))
 
 
 def pull_from_TBP(class_number, super_dict):
