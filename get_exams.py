@@ -119,15 +119,10 @@ def pull_from_TBP(class_number, super_dict):
 
         data = row.find_all("td")
         exam_type = data[1].text
-        content_type = data[2].text
-        semester = data[3].text
-        try:
-            link = row.find("a", class_="exam-download-link").get('href')
-        except AttributeError:
-            continue
-
-        index = 0 if content_type == 'Exam' else 1
-        super_dict[semester][exam_type][index] = link
+        semester = data[2].text
+        for anchor in row.find_all("a", class_="exam-download-link"):
+            index = 0 if anchor.text.strip() == _EXAM else 1
+            super_dict[semester][exam_type][index] = anchor.get("href")
 
     download_files("TBP", class_number, super_dict)
 

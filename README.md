@@ -14,7 +14,7 @@ the following extra modules:
 - [Beautiful Soup 4](http://www.crummy.com/software/BeautifulSoup/)
 - [Requests](http://docs.python-requests.org/en/latest/)
 
-Users of ``pip`` can install these modules using 
+Users of [pip](https://pip.pypa.io/en/stable/) can install these modules using 
 ``pip install -r requirements.txt.``
 
 ## Usage
